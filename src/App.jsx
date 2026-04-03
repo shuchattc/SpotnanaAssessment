@@ -26,22 +26,32 @@ localStorage.setItem("chatHistory", JSON.stringify(messages));
 }
 }, [messages]);
 
-const handleSubmit = async () => {
+const handleSubmit = async (prompt) => {
+if (!prompt.trim()) return; // .trim method to remove whitespace-only strings, if !prompt was used then it would still allow for this
+
+setError(null);
+
+try {
   setLoading(true);
-  try {
-    const res = await fetch('https://spotnanaassessmentbackend.onrender.com/api/response', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt }),
-    });
-    const data = await res.json();
-    setResult(data.result);
-  } catch (err) {
-    console.error(err);
-    setError('Failed to get response from API');
-  } finally {
-    setLoading(false);
-  }
+
+  const response = await fetchAIResponse(prompt);
+
+  // newMessage obj contains users input (prompt) and response from openai api (response)
+  const newMessage = {
+    prompt,
+    response,
+  };
+  
+  //prev current state value of messages, spread operator copies everything inside prev then adds newMessage on the end
+  //using prev instead of ...messages because the responses we expect back are asynchronous
+  setMessages((prev) => [...prev, newMessage]);
+
+} catch (err) {
+  setError(err.message);
+} finally {
+  setLoading(false);
+}
+
 };
 
 const handleClear = () => {
