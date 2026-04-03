@@ -6,7 +6,7 @@
 // };
 
 export const fetchAIResponse = async (prompt) => {
-  const res = await fetch("http://localhost:5000/api/response", {
+  const res = await fetch("https://spotnanaassessmentbackend.onrender.com/api/response", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
